@@ -3,7 +3,9 @@
 namespace Encore\Authorize\Console;
 
 use Encore\Admin\Models\Menu;
+use Encore\Authorize\Models\User;
 use Illuminate\Console\Command;
+use Illuminate\Support\Facades\DB;
 
 class InitCommand extends Command
 {
@@ -65,7 +67,6 @@ class InitCommand extends Command
         }
 
         $roleModel = config('admins.authorize.roles_model');
-        $userModel = config('admins.authorize.users_model');
         // 如果不存在超管角色，创建一个
         if (!$roleModel::query()->where('slug', 'administrator')->exists()) {
             $roleModel::unguard();
@@ -76,8 +77,17 @@ class InitCommand extends Command
             ]);
 
             // 给用户设置超管角色
-            $user = $userModel::find(1);
-            $user->roles()->save($role);
+            try{
+                DB::transaction(function () use ($role) {
+                    $userModel = config('admin.database.users_model');
+                    $user = $userModel::find(1);
+                    $user->roles()->save($role);
+                    $user->fill(['permissions' => []])->save();
+                });
+                $this->info('Initialization successful');
+            } catch (\Exception $exception) {
+                $this->error('initialization failed:'.$exception->getMessage());
+            }
         }
     }
 }

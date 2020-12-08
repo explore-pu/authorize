@@ -4,6 +4,7 @@ namespace Encore\Authorize;
 
 use Encore\Admin\Form;
 use Encore\Authorize\Http\Middleware\AuthorizeMiddleware;
+use Encore\Authorize\Models\User;
 use Illuminate\Support\ServiceProvider;
 
 class AuthorizeServiceProvider extends ServiceProvider
@@ -52,8 +53,8 @@ class AuthorizeServiceProvider extends ServiceProvider
 
         // 替换配置文件
         config([
-            'admin.auth.providers.admin.model' => config('admins.authorize.users_model'),
-            'admin.database.users_model' => config('admins.authorize.users_model'),
+            'admin.auth.providers.admin.model' => config('admins.authorize.users_model', User::class),
+            'admin.database.users_model' => config('admins.authorize.users_model', User::class),
             'admin.route.middleware.authorize' => 'admin.authorize',
         ]);
 

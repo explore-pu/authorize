@@ -16,10 +16,6 @@ class AuthorizeMiddleware
      */
     public function handle(Request $request, \Closure $next)
     {
-//        dd(get_routes());
-//        dd(set_permissions());
-//        dd(group_permissions());
-//        dd(Admin::user());
         if (!Admin::user() || $this->shouldPassThrough($request)) {
             return $next($request);
         }

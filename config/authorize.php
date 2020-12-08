@@ -1,14 +1,13 @@
 <?php
 
 return [
-
-    'users_model' => Encore\Authorize\Models\User::class,
-
     'roles_table' => 'admin_roles',
 
     'roles_model' => Encore\Authorize\Models\Role::class,
 
 //    'roles_controller' => \Encore\Authorize\Http\Controllers\RoleController::class,
+
+//    'users_model' => Encore\Authorize\Models\User::class,
 
     'role_users_table' => 'admin_role_users',
 

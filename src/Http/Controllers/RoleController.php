@@ -58,7 +58,7 @@ class RoleController extends AdminController
         $table->filter(function(Table\Filter $filter){
             $filter->disableIdFilter();
             $filter->scope('trashed', trans('admin.trashed'))->onlyTrashed();
-            $filter->like('slug', trans('admin.username'));
+            $filter->like('slug', trans('admin.slug'));
             $filter->like('name', trans('admin.name'));
         });
 
