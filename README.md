@@ -14,7 +14,7 @@ composer require pucoder/laravel-admin:2.*
 ## Installation
 
 ```shell
-composer require pucoder/authorization
+composer require pucoder/authorize
 ```
 
 Publish resources：
@@ -57,7 +57,7 @@ $router->post('users/{user}/restore', 'UserController@restore')->name('users.res
 
 - 路由已创建
 
-- 创建action `app/Admin/Actions/Users/Replicate.php`
+- 创建action `app/Admin/Actions/Replicate.php`
   ```php
   namespace App\Admin\Actions\Users;
   
@@ -69,19 +69,32 @@ $router->post('users/{user}/restore', 'UserController@restore')->name('users.res
   class Replicate extends RowAction
   {
       /**
+       * 设置路由请求方法
        * @var string
        */
       protected $method = 'POST';
   
       /**
+       * 操作名称
        * @return array|null|string
        */
       public function name()
       {
           return '恢复';
       }
+  
+      //============需要权限判断时用到的方法，不需要权限判断请注释或删除此方法=================
+      /**
+       * 设置路由请求路径
+       * @return string
+       */
+      public function getHandleUrl()
+      {
+          // 这里请仔细
+          return $this->parent->resource().'/'.$this->getKey().'/restore';
+      }
       
-      //============方式二需要用到的方法=================
+      //============不需要权限判断时用到的方法，需要权限判断请注释或删除此方法=================
       /**
        * @param Model $model
        *
@@ -99,33 +112,13 @@ $router->post('users/{user}/restore', 'UserController@restore')->name('users.res
   
           return $this->response()->success('恢复成功！')->refresh();
       }
-      //============方式二需要用到的方法=================
       
-      /**
-       * @return string
-       */
-      public function getHandleUrl()
-      {
-          return '';
-      }
-  
       /**
        * @return void
        */
       public function dialog()
       {
           $this->question('确认恢复？');
-      }
-  
-      /**
-       * @return string
-       */
-      public function render()
-      {
-          // 这里url的属性值就是【用户恢复】的路由路径
-          $this->attribute('url', $this->parent->resource().'/'.$this->getKey().'/restore');
-  
-          return parent::render();
       }
   }
   ```
@@ -139,25 +132,29 @@ $router->post('users/{user}/restore', 'UserController@restore')->name('users.res
   {
       public function restore($id)
       {
-          //方式一
-          //$model = User::withTrashed()->find($id);
+          //需要权限判断时
+          try {
+              $model = User::withTrashed()->find($id);
+              DB::transaction(function () use ($model) {
+                  $model->restore();
+              });
+          } catch (\Exception $exception) {
+              return $this->response()->error("恢复失败！: {$exception->getMessage()}")->send();
+          }
 
-          //if ($model->restore()) {
-          //    abort(200, '恢复成功！');//这里的返回信息目前laravel-admin不够完善
-          //}
+          return $this->response()->success('恢复成功！')->refresh()->send();
 
-          //abort(500, '恢复失败！');
   
-          //方式二
+          //不需要权限判断时
           return app(HandleController::class)->handleAction(request());
       }
   }
   ```
 
-如果出现英文，请添加对应本地翻译即可
+# 如果出现英文，请添加本地翻译即可
 
 ### 关于Switch开关权限
 
-由于laravel-admin本身的switch操作无法判断权限
+由于laravel-admin本身的switch操作属于更新操作，无法单独判断权限
 
-这里提供另外一种action方式实现权限控制，请参考 [这里](https://laravel-admin.org/docs/zh/2.x/model-table-column-display#列操作)
+这里提供另外一种action方式实现switch操作权限控制，请参考 [这里](https://laravel-admin.org/docs/zh/2.x/model-table-column-display#列操作)
