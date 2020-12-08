@@ -80,9 +80,6 @@ class UserController extends Controller
             ->optionDataAttributes('permissions', $roleModel::pluck('permissions', 'id'));
         $form->checkboxGroup('permissions', trans('admin.permissions'))->options(group_permissions())->related('roles', 'permissions');
 
-        $form->display('created_at', trans('admin.created_at'));
-        $form->display('updated_at', trans('admin.updated_at'));
-
         return $form;
     }
 }
