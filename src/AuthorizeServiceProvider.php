@@ -4,7 +4,6 @@ namespace Encore\Authorize;
 
 use Encore\Admin\Form;
 use Encore\Authorize\Http\Middleware\AuthorizeMiddleware;
-use Encore\Authorize\Models\User;
 use Illuminate\Support\ServiceProvider;
 
 class AuthorizeServiceProvider extends ServiceProvider
@@ -33,10 +32,6 @@ class AuthorizeServiceProvider extends ServiceProvider
             Authorize::routes(__DIR__.'/../routes/web.php');
         });
 
-//        if ($this->app->runningInConsole() && $assets = $extension->assets) {
-//            $this->publishes([$assets => public_path('vendor/pucoder/authorize')], 'admin-authorize-assets');
-//        }
-
         if ($this->app->runningInConsole() && $migrations = $extension->migrations) {
             $this->publishes([$migrations => database_path('migrations')], 'admin-authorize-migrations');
         }
@@ -57,9 +52,9 @@ class AuthorizeServiceProvider extends ServiceProvider
 
         // 替换配置文件
         config([
-            'admin.auth.providers.admin.model' => User::class,
-            'admin.database.users_model' => User::class,
-            'admin.route.middleware' => ['web', 'admin', 'admin.authorize'],
+            'admin.auth.providers.admin.model' => config('admins.authorize.users_model'),
+            'admin.database.users_model' => config('admins.authorize.users_model'),
+            'admin.route.middleware.authorize' => 'admin.authorize',
         ]);
 
         $this->commands($this->commands);

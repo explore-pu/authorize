@@ -2,6 +2,8 @@
 
 return [
 
+    'users_model' => Encore\Authorize\Models\User::class,
+
     'roles_table' => 'admin_roles',
 
     'roles_model' => Encore\Authorize\Models\Role::class,

@@ -4,8 +4,6 @@ namespace Encore\Authorize\Console;
 
 use Encore\Admin\Models\Menu;
 use Illuminate\Console\Command;
-use Encore\Authorize\Models\User;
-use Encore\Authorize\Models\Role;
 
 class InitCommand extends Command
 {
@@ -66,17 +64,19 @@ class InitCommand extends Command
             ]);
         }
 
+        $roleModel = config('admins.authorize.roles_model');
+        $userModel = config('admins.authorize.users_model');
         // 如果不存在超管角色，创建一个
-        if (!Role::query()->where('slug', 'administrator')->exists()) {
-            Role::unguard();
-            $role = Role::query()->create([
+        if (!$roleModel::query()->where('slug', 'administrator')->exists()) {
+            $roleModel::unguard();
+            $role = $roleModel::query()->create([
                 'name' => trans('admin.super_administrator'),
                 'slug' => 'administrator',
                 'permissions' => ['*'],
             ]);
 
             // 给用户设置超管角色
-            $user = User::find(1);
+            $user = $userModel::find(1);
             $user->roles()->save($role);
         }
     }

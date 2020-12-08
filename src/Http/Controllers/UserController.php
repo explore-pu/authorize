@@ -41,7 +41,7 @@ class UserController extends Controller
      */
     protected function detail($id)
     {
-        $userModel = config('admin.database.users_model');
+        $userModel = config('admins.authorize.users_model');
 
         $show = new Show($userModel::findOrFail($id));
 
@@ -74,7 +74,7 @@ class UserController extends Controller
      */
     public function form()
     {
-        $userModel = config('admin.database.users_model');
+        $userModel = config('admins.authorize.users_model');
         $userTable = config('admin.database.users_table');
         $connection = config('admin.database.connection');
 
