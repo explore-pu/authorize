@@ -53,7 +53,7 @@ $router->post('users/{user}/restore', 'UserController@restore')->name('users.res
 
 ### Action通过路由访问控制（推荐使用方式二）
 
-如果你使用了laravel-admin的actions，并希望进行访问控制，这里以用户的 `恢复操作` 为例
+如果你使用了laravel-admin的actions，并希望进行访问控制，这里以用户的 `复制操作` 为例
 
 - 路由已创建
 
@@ -80,10 +80,10 @@ $router->post('users/{user}/restore', 'UserController@restore')->name('users.res
        */
       public function name()
       {
-          return '恢复';
+          return '复制';
       }
   
-      //============需要权限判断时用到的方法，不需要权限判断请注释或删除此方法=================
+      //========================如果需要权限判断，请添加此方法===========================
       /**
        * 设置路由请求路径
        * @return string
@@ -91,10 +91,10 @@ $router->post('users/{user}/restore', 'UserController@restore')->name('users.res
       public function getHandleUrl()
       {
           // 这里请仔细
-          return $this->parent->resource().'/'.$this->getKey().'/restore';
+          return $this->parent->resource().'/'.$this->getKey().'/replicate';
       }
       
-      //============不需要权限判断时用到的方法，需要权限判断请注释或删除此方法=================
+      //============如果不需要权限判断或者在这里进行逻辑处理，请添加此方法=================
       /**
        * @param Model $model
        *
@@ -104,13 +104,13 @@ $router->post('users/{user}/restore', 'UserController@restore')->name('users.res
       {
           try {
               DB::transaction(function () use ($model) {
-                  $model->restore();
+                  $model->replicate()->save();
               });
           } catch (\Exception $exception) {
-              return $this->response()->error('恢复失败！: {$exception->getMessage()}');
+              return $this->response()->error('复制失败！: {$exception->getMessage()}');
           }
   
-          return $this->response()->success('恢复成功！')->refresh();
+          return $this->response()->success('复制成功！')->refresh();
       }
       
       /**
@@ -118,35 +118,34 @@ $router->post('users/{user}/restore', 'UserController@restore')->name('users.res
        */
       public function dialog()
       {
-          $this->question('确认恢复？');
+          $this->question('确认复制？');
       }
   }
   ```
 
-- 创建方法
+- 创建自定义路由方法
   ```php
   
   use Encore\Admin\Http\Controllers\HandleController;
   
   class UserController extends AdminController
   {
-      public function restore($id)
+      // 二选一
+      public function replicate($id)
       {
-          //需要权限判断时
+          //一：在这里进行逻辑处理
           try {
               $model = User::withTrashed()->find($id);
               DB::transaction(function () use ($model) {
-                  $model->restore();
+                  $model->replicate()->save();
               });
           } catch (\Exception $exception) {
-              return $this->response()->error("恢复失败！: {$exception->getMessage()}")->send();
+              return $this->response()->error("复制失败！: {$exception->getMessage()}")->send();
           }
+          return $this->response()->success('复制成功！')->refresh()->send();
 
-          return $this->response()->success('恢复成功！')->refresh()->send();
-
-  
-          //不需要权限判断时
-          return app(HandleController::class)->handleAction(request());
+          //二：去Replicate逻辑处理
+          //return $this->handleAction();
       }
   }
   ```
