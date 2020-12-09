@@ -45,7 +45,14 @@ class RoleController extends AdminController
 
         $table->actions(function (Table\Displayers\Actions $actions) {
             if ($actions->row->slug == 'administrator') {
-                $actions->disableDelete();
+                $actions->disableDestroy();
+            }
+            if ($actions->row->deleted_at) {
+                $actions->disableEdit();
+                $actions->disableView();
+                $actions->disableDestroy();
+                $actions->add(new Table\Actions\Restore());
+                $actions->add(new Table\Actions\Delete());
             }
         });
 

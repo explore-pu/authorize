@@ -3,6 +3,7 @@
 namespace Encore\Authorize\Models;
 
 use Encore\Admin\Models\User as BaseModel;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Routing\Route;
 
 /**
@@ -25,7 +26,7 @@ class User extends BaseModel
     /**
      * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany
      */
-    public function roles()
+    public function roles(): BelongsToMany
     {
         $roleModel = config('admins.authorize.roles_model');
         $table = config('admins.authorize.role_users_table') ?: 'admin_role_users';
@@ -88,5 +89,21 @@ class User extends BaseModel
         }
 
         return false;
+    }
+
+    /**
+     * Detach models from the relationship.
+     *
+     * @return void
+     */
+    protected static function boot()
+    {
+        parent::boot();
+
+        static::deleting(function ($model) {
+            if (!method_exists($model, 'trashed') || (method_exists($model, 'trashed') && $model->trashed())) {
+                $model->roles()->detach();
+            }
+        });
     }
 }
