@@ -26,6 +26,7 @@ class RoleController extends AdminController
     {
         $roleModel = config('admins.authorize.roles_model');
         $table = new Table(new $roleModel());
+        $table->model()->orderByDesc('id');
 
         $table->column('id', 'ID')->sortable();
         $table->column('slug', trans('admin.slug'));
