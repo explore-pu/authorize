@@ -5,7 +5,7 @@
     "keywords": ["laravel-admin", "extension", "authorize"],
     "homepage": "https://github.com/pucoder/authorize",
     "license": "MIT",
-    "version": "v1.0.0",
+    "version": "v1.0.1",
     "authors": [
         {
             "name": "xiaozhi",
