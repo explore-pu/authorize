@@ -16,11 +16,14 @@ class AuthorizeMiddleware
      */
     public function handle(Request $request, \Closure $next)
     {
+//        dd(group_permissions());
+//        dd(set_permissions());
+//        dd(get_routes());
         if (!Admin::user() || $this->shouldPassThrough($request)) {
             return $next($request);
         }
 
-        if (Admin::user()->canAccessRoute($request->route())) {
+        if (Admin::user()->canRoute($request->route())) {
             return $next($request);
         }
 

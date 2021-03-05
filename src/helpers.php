@@ -1,20 +1,75 @@
 <?php
 
+if (!function_exists('string_between')) {
+    /**
+     * @param string $strings
+     * @param string $start_str
+     * @param string $end_str
+     * @param int $for_num
+     * @param string $symbol
+     * @return string
+     */
+    function string_between($strings, $start_str, $end_str, $for_num = 0, $symbol = "-")
+    {
+        $switch = false;
+        $string = '';
+        $index = 0;
+
+        for ($i = 0; $i < strlen($strings); $i++) {
+            if (!$switch && substr($strings, $i, 1) === $start_str) {
+                $switch = true;
+                $index++;
+                continue;
+            }
+            if ($switch && substr($strings, $i, 1) === $end_str) {
+                $switch = false;
+                if ($for_num && $index === $for_num) {
+                    break;
+                }
+                $string .= $symbol;
+            }
+            if ($switch) {
+                $string .= substr($strings, $i, 1);
+            }
+        }
+
+        return rtrim($string, $symbol);
+    }
+}
+
+if (! function_exists('set_route_url')) {
+    /**
+     * @param $uri
+     * @return mixed
+     */
+    function set_route_url($uri)
+    {
+        if (mb_strpos($uri, "{") !== false && mb_strpos($uri, "}") !== false) {
+            $between = string_between($uri, "{", "}", 1);
+
+            $uri = str_replace("{" . $between . "}", "*", $uri);
+
+            $uri = set_route_url($uri);
+        }
+
+        return $uri;
+    }
+}
+
 if (!function_exists('get_routes')) {
     /**
-     * 获取权限
-     *
      * @return array
      */
     function get_routes()
     {
         $routes = [
             'all_permissions' => '*',
-            'home' => 'GET=>/',
-            'self_setting' => '',
-            'admin_users' => [],
-            'admin_menus' => [],
-            'admin_roles' => [],
+            'home' => '',
+            'auth_setting' => '',
+            'auth_users' => [],
+            'auth_menus' => [],
+            'auth_roles' => [],
+            'auth_logs'  => [],
         ];
 
         foreach (app('router')->getRoutes() as $route) {
@@ -36,8 +91,6 @@ if (!function_exists('get_routes')) {
 
 if (!function_exists('set_permissions')) {
     /**
-     * 设置权限
-     *
      * @return array
      */
     function set_permissions()
@@ -82,13 +135,12 @@ if (!function_exists('set_permissions')) {
 
 if (!function_exists('group_permissions')) {
     /**
-     * 路由分组
-     *
      * @return array
      */
     function group_permissions()
     {
         $new_routes = [];
+
         foreach (set_permissions() as $keys => $values) {
             if (is_array($values) && empty($values)) {
                 $new_routes[$keys] = [];
@@ -100,6 +152,6 @@ if (!function_exists('group_permissions')) {
             }
         }
 
-        return $new_routes;
+        return array_filter($new_routes);
     }
 }

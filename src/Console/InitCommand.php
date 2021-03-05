@@ -3,7 +3,7 @@
 namespace Encore\Authorize\Console;
 
 use Encore\Admin\Models\Menu;
-use Encore\Authorize\Models\User;
+use Encore\Authorize\Models\Administrator;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\DB;
 
@@ -54,15 +54,15 @@ class InitCommand extends Command
         $this->call('migrate');
 
         // 如果不存在角色菜单，创建一个
-        if (!Menu::query()->where('uri', 'admin_roles')->exists()) {
+        if (!Menu::query()->where('uri', 'auth_roles')->exists()) {
             // 创建菜单项
             $lastOrder = Menu::query()->max('order');
             Menu::query()->create([
-                'parent_id' => 0,
+                'parent_id' => 2,
                 'order' => $lastOrder++,
                 'title' => trans('admin.roles'),
                 'icon' => 'fas fa-user',
-                'uri' => 'admin_roles',
+                'uri' => 'auth_roles',
             ]);
         }
 

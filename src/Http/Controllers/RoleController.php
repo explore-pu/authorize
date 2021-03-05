@@ -4,6 +4,7 @@ namespace Encore\Authorize\Http\Controllers;
 
 use Encore\Admin\Form;
 use Encore\Admin\Http\Controllers\AdminController;
+use Encore\Admin\Models\Menu;
 use Encore\Admin\Show;
 use Encore\Admin\Table;
 
@@ -31,16 +32,6 @@ class RoleController extends AdminController
         $table->column('id', 'ID')->sortable();
         $table->column('slug', trans('admin.slug'));
         $table->column('name', trans('admin.name'));
-        $table->column('permissions', trans('admin.permissions'))->width(500)->display(function ($permissions) {
-            $names = [];
-            foreach (set_permissions() as $key => $value) {
-                if ($permissions && in_array($value, $permissions)) {
-                    array_push($names, $key);
-                }
-            }
-            return $names;
-        })->label();
-
         $table->column('created_at', trans('admin.created_at'));
         $table->column('updated_at', trans('admin.updated_at'));
 
@@ -88,15 +79,6 @@ class RoleController extends AdminController
         $show->field('id', 'ID');
         $show->field('slug', trans('admin.slug'));
         $show->field('name', trans('admin.name'));
-        $show->field('permissions', trans('admin.permissions'))->as(function ($permissions) {
-            $names = [];
-            foreach (set_permissions() as $key => $value) {
-                if ($permissions && in_array($value, $permissions)) {
-                    array_push($names, $key);
-                }
-            }
-            return $names;
-        })->label();
         $show->field('created_at', trans('admin.created_at'));
         $show->field('updated_at', trans('admin.updated_at'));
 
@@ -112,7 +94,6 @@ class RoleController extends AdminController
     {
         $roleModel = config('admins.authorize.roles_model');
         $form = new Form(new $roleModel());
-        $form->horizontal();
 
         $form->text('name', trans('admin.name'))->required();
         $form->text('slug', trans('admin.slug'))->with(function ($value, Form\Field $field) {
@@ -120,7 +101,18 @@ class RoleController extends AdminController
                 $field->readonly();
             }
         })->required();
-        $form->checkboxGroup('permissions', trans('admin.permissions'))->options(group_permissions());
+
+        $form->embeds('permissions', trans('admin.permissions'), function (Form\EmbeddedForm $embeds) {
+            $embeds->row(function (Form\Layout\Row $row) {
+                $row->column(8, function (Form\Layout\Column $column) {
+                    $column->checkboxGroup('routes', trans('admin.route'))->options(group_permissions())->related('roles', 'permissions');
+                });
+                $row->column(4, function (Form\Layout\Column $column) {
+                    $column->jstree('menus', trans('admin.menus'))->options(Menu::select(['id', 'title as text', 'parent_id as parent'])->get()->toArray());
+                });
+
+            });
+        });
 
         return $form;
     }

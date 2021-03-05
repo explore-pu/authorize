@@ -7,9 +7,14 @@ return [
 
 //    'roles_controller' => \Encore\Authorize\Http\Controllers\RoleController::class,
 
-//    'users_model' => Encore\Authorize\Models\User::class,
+    'users_model' => Encore\Authorize\Models\Administrator::class,
+
+//    'users_controller' => \Encore\Authorize\Http\Controllers\UserController::class,
 
     'role_users_table' => 'admin_role_users',
+
+    // Limit the maximum number of administrator roles that can be selected, default is 0, 0 means no limit
+//    'users_maximum_roles' => 0,
 
     'route' => [
         // 授权时需要排除的路由

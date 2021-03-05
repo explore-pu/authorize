@@ -2,14 +2,14 @@
 
 namespace Encore\Authorize\Models;
 
-use Encore\Admin\Models\User as BaseModel;
+use Encore\Admin\Models\Administrator as BaseModel;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Routing\Route;
 
 /**
  * @method static find(int $int)
  */
-class User extends BaseModel
+class Administrator extends BaseModel
 {
     protected $fillable = [
         'username',
@@ -20,7 +20,7 @@ class User extends BaseModel
     ];
 
     protected $casts = [
-        'permissions'  => 'array'
+        'permissions'  => 'json'
     ];
 
     /**
@@ -34,10 +34,20 @@ class User extends BaseModel
         return $this->belongsToMany($roleModel, $table, 'user_id', 'role_id')->withTimestamps();
     }
 
+//    public function setPermissionsAttribute($value)
+//    {
+//        return $this->attributes['permissions'] = json_encode(array_values($value), JSON_UNESCAPED_UNICODE);
+//    }
+//
+//    public function getPermissionsAttribute($value)
+//    {
+//        return array_values(json_decode($value, true) ?: []);
+//    }
+
     /**
      * @return bool
      */
-    public function isAdministrator()
+    public function isAdministrator():bool
     {
         return $this->roles->where('slug', 'administrator')->isNotEmpty();
     }
@@ -54,7 +64,7 @@ class User extends BaseModel
      * @param integer $menu menu id
      * @return bool
      */
-    public function canSeeMenu($menu)
+    public function canMenu($menu)
     {
         if ($this->isAdministrator() || isset($menu['children']) || url()->isValidUrl($menu['uri'])) {
             return true;
@@ -74,7 +84,7 @@ class User extends BaseModel
      *
      * @return bool
      */
-    public function canAccessRoute(Route $route)
+    public function canRoute(Route $route)
     {
         if ($this->isAdministrator()) {
             return true;

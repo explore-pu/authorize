@@ -3,11 +3,18 @@
 use Encore\Authorize\Http\Controllers\UserController;
 use Encore\Authorize\Http\Controllers\RoleController;
 use Illuminate\Support\Facades\Route;
+use Illuminate\Routing\Router;
 
-$userController = config('admin.database.users_controller', UserController::class);
-Route::resource('admin_users', $userController)->names('admin_users');
+Route::group([
+//    'prefix'     => config('admin.route.prefix'),
+//    'middleware' => config('admin.route.middleware'),
+    'as'         => config('admin.route.as') . '.',
+], function (Router $router) {
+    $userController = config('admins.authorize.users_controller', UserController::class);
+    $router->resource('auth_users', $userController)->names('auth_users');
 
-$roleController = config('admins.authorize.roles_controller', RoleController::class);
-Route::resource('admin_roles', $roleController)->names('admin_roles');
-Route::put('admin_roles/{admin_user}/restore', $roleController.'@restore')->name('admin_roles.restore');
-Route::delete('admin_roles/{admin_user}/delete', $roleController.'@delete')->name('admin_roles.delete');
+    $roleController = config('admins.authorize.roles_controller', RoleController::class);
+    $router->resource('auth_roles', $roleController)->names('auth_roles');
+    $router->put('auth_roles/{auth_role}/restore', $roleController.'@restore')->name('auth_roles.restore');
+    $router->delete('auth_roles/{auth_role}/delete', $roleController.'@delete')->name('auth_roles.delete');
+});
