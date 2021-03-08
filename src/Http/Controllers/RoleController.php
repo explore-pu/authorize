@@ -2,6 +2,7 @@
 
 namespace Encore\Authorize\Http\Controllers;
 
+use Encore\Admin\Facades\Admin;
 use Encore\Admin\Form;
 use Encore\Admin\Http\Controllers\AdminController;
 use Encore\Admin\Models\Menu;
@@ -105,12 +106,13 @@ class RoleController extends AdminController
         $form->embeds('permissions', trans('admin.permissions'), function (Form\EmbeddedForm $embeds) {
             $embeds->row(function (Form\Layout\Row $row) {
                 $row->column(8, function (Form\Layout\Column $column) {
-                    $column->checkboxGroup('routes', trans('admin.route'))->options(group_permissions())->related('roles', 'permissions');
+                    $column->checkboxGroup('routes', trans('admin.route').trans('admin.permissions'))
+                        ->options(group_permissions());
                 });
                 $row->column(4, function (Form\Layout\Column $column) {
-                    $column->jstree('menus', trans('admin.menus'))->options(Menu::select(['id', 'title as text', 'parent_id as parent'])->get()->toArray());
+                    $column->checktree('menus', trans('admin.menus').trans('admin.permissions'))
+                        ->options(Admin::menu());
                 });
-
             });
         });
 

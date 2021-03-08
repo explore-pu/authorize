@@ -16,9 +16,6 @@ class AuthorizeMiddleware
      */
     public function handle(Request $request, \Closure $next)
     {
-//        dd(group_permissions());
-//        dd(set_permissions());
-//        dd(get_routes());
         if (!Admin::user() || $this->shouldPassThrough($request)) {
             return $next($request);
         }
@@ -40,11 +37,11 @@ class AuthorizeMiddleware
     /**
      * Determine if the request has a URI that should pass through verification.
      *
-     * @param \Illuminate\Http\Request $request
+     * @param Request $request
      *
      * @return bool
      */
-    protected function shouldPassThrough($request)
+    protected function shouldPassThrough($request): bool
     {
         return collect(config('admins.authorize.route.excepts', []))
             ->map('admin_base_path')

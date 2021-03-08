@@ -18,7 +18,7 @@ class CheckBoxGroup extends Checkbox
      * @param string $field
      * @return $this
      */
-    public function related($related, $field)
+    public function related($related, $field): CheckBoxGroup
     {
         $this->relatedField = [$related, $field];
 
@@ -43,7 +43,9 @@ class CheckBoxGroup extends Checkbox
 
 
     /**
-     * {@inheritdoc}
+     * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View|string
+     * @throws \ReflectionException
+     * @throws \Throwable
      */
     public function render()
     {
@@ -55,8 +57,6 @@ class CheckBoxGroup extends Checkbox
             'options'       => $this->getOptions(),
             'relatedField'  => json_encode($this->relatedField),
         ]);
-
-        $this->addCascadeScript();
 
         return parent::fieldRender();
     }
