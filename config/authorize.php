@@ -30,7 +30,7 @@ return [
         ],
         // 授权时需要合并的路由 【key的权限合并到value权限】
         'merge' => [
-            'self_setting_put' => 'self_setting',
+            'auth_setting_put' => 'auth_setting',
             'store' => 'create',
             'update' => 'edit',
         ]

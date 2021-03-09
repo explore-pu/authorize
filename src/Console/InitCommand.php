@@ -73,7 +73,6 @@ class InitCommand extends Command
             $role = $roleModel::query()->create([
                 'name' => trans('admin.super_administrator'),
                 'slug' => 'administrator',
-                'permissions' => ['*'],
             ]);
 
             // 给用户设置超管角色
@@ -82,7 +81,6 @@ class InitCommand extends Command
                     $userModel = config('admin.database.users_model');
                     $user = $userModel::find(1);
                     $user->roles()->save($role);
-                    $user->fill(['permissions' => []])->save();
                 });
                 $this->info('Initialization successful');
             } catch (\Exception $exception) {

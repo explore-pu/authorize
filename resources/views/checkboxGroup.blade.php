@@ -1,11 +1,13 @@
 <div {!! admin_attrs($group_attrs) !!} id="{{ $column }}">
-    <label for="@id" class="{{$viewClass['label']}}">{{$label}}</label>
+    <label for="@id" class="{{$viewClass['label']}}">{{ $label }}</label>
     <div class="{{$viewClass['field']}}" id="@id">
         @foreach($options as $option => $label)
             @if(is_string($label))
                 {!! $inline ? admin_color('<span class="icheck-%s">') : admin_color('<div class="radio icheck-%s">') !!}
-                <input type="checkbox" id="@id" name="{{$name}}[]" value="{{$option}}" class="{{$class}}" {{ false !== array_search($option, array_filter($value ?? [])) || ($value === null && in_array($option, $checked)) ?'checked':'' }} {!! $attributes !!} />
-                <label for="@id" class="my-1">&nbsp;{{$label}}&nbsp;&nbsp;</label>
+                <input type="checkbox" id="@id" name="{{ $name }}[]" value="{{ $option }}" class="{{ $class }}"
+                    {{ false !== array_search($option, array_filter($value ?? [])) || ($value === null && in_array($option, $checked)) ?'checked':'' }}
+                    {!! $attributes !!} />
+                <label for="@id" class="my-1">&nbsp;{{ $label }}&nbsp;&nbsp;</label>
                 {!! $inline ? '</span>' :  '</div>' !!}
             @endif
         @endforeach
@@ -23,8 +25,10 @@
                     <div class="col-10 border-left">
                         @foreach($labels as $option => $label)
                             {!! $inline ? admin_color('<span class="icheck-%s">') : admin_color('<div class="radio icheck-%s">') !!}
-                            <input type="checkbox" id="@id" name="{{$name}}[]" value="{{$option}}" class="{{$class}} children" {{ false !== array_search($option, array_filter($value ?? [])) || ($value === null && in_array($option, $checked)) ?'checked':'' }} {!! $attributes !!} />
-                            <label for="@id" class="my-1">&nbsp;{{$label}}&nbsp;&nbsp;</label>
+                            <input type="checkbox" id="@id" name="{{ $name }}[]" value="{{ $option }}" class="{{ $class }} children"
+                                {{ false !== array_search($option, array_filter($value ?? [])) || ($value === null && in_array($option, $checked)) ?'checked':'' }}
+                                {!! $attributes !!} />
+                            <label for="@id" class="my-1">&nbsp;{{ $label }}&nbsp;&nbsp;</label>
                             {!! $inline ? '</span>' :  '</div>' !!}
                         @endforeach
                     </div>
@@ -33,7 +37,7 @@
                 <hr class="my-2">
             @endif
         @endforeach
-        <input type="hidden" name="{{$name}}[]">
+        <input type="hidden" name="{{ $name }}[]">
         @include('admin::form.error')
         @include('admin::form.help-block')
     </div>
@@ -56,7 +60,7 @@
                 var data_fileds = [];
                 $.each($(roles).find('option:selected'), function (key, val) {
                     let push = $(val).data(related_field[1]);
-                    let data_field = (related_field[1]).split('.');
+                    let data_field = (related_field[1]).split('->');
                     if (data_field.length > 1) {
                         push = $(val).data(data_field[0])[data_field[1]];
                     }
@@ -91,9 +95,10 @@
             var group_fields = $(field).parents('.row.group:first');
             var fields = group_fields.find('{{ $selector }}').length;
             var checked_fields = group_fields.find('{{ $selector }}:checked').length;
+            var disabled_fields = group_fields.find('{{ $selector }}:disabled').length;
             group_fields.find('.{{ $checkAllClass }}').prop('checked', checked_fields === fields);
 
-            if ($(field).prop('disabled') && checked_fields === fields) {
+            if ($(field).prop('disabled') && disabled_fields === fields) {
                 group_fields.find('.{{ $checkAllClass }}').prop('disabled', true);
             } else {
                 group_fields.find('.{{ $checkAllClass }}').prop('disabled', false);

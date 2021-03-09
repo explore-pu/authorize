@@ -103,12 +103,12 @@ class UserController extends Controller
                 $row->column(8, function (Form\Layout\Column $column) {
                     $column->checkboxGroup('routes', trans('admin.route').trans('admin.permissions'))
                         ->options(group_permissions())
-                        ->related('roles', 'permissions.routes');
+                        ->related('roles', 'permissions->routes');
                 });
                 $row->column(4, function (Form\Layout\Column $column) {
                     $column->checktree('menus', trans('admin.menus').trans('admin.permissions'))
                         ->options(Admin::menu())
-                        ->related('roles', 'permissions.menus');
+                        ->related('roles', 'permissions->menus');
                 });
             });
         });

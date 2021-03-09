@@ -1,11 +1,10 @@
-<?php /** @noinspection PhpUndefinedFieldInspection */
+<?php
 
 namespace Encore\Authorize\Models;
 
 use Encore\Admin\Models\Administrator as BaseModel;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Routing\Route;
-use Illuminate\Support\Collection;
 
 /**
  * @method static find(int $int)
@@ -25,6 +24,8 @@ class Administrator extends BaseModel
     ];
 
     /**
+     * Current user roles
+     *
      * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany
      */
     public function roles(): BelongsToMany
@@ -36,6 +37,8 @@ class Administrator extends BaseModel
     }
 
     /**
+     * Determine whether it is an administrator
+     *
      * @return bool
      */
     public function isAdministrator():bool
@@ -44,35 +47,52 @@ class Administrator extends BaseModel
     }
 
     /**
-     * @return Collection
-     */
-    public function allPermissions(): Collection
-    {
-        return $this->roles()->pluck('permissions')->merge($this->permissions);
-    }
-
-    /**
+     * Determine whether there is menu permission
+     *
      * @param $menu
      * @return bool
      */
-//    public function canMenu($menu): bool
-//    {
-//        if ($this->isAdministrator() || isset($menu['children']) || url()->isValidUrl($menu['uri'])) {
-//            return true;
-//        }
-//
-//        foreach ($this->allPermissions() as $permissions) {
-//            if ($permissions === '*' || in_array('GET=>' . $menu['uri'], explode('&&', $permissions))) {
-//                return true;
-//            }
-//        }
-//
-//        return false;
-//    }
+    public function canMenu($menu): bool
+    {
+        if ($this->isAdministrator()) {
+            return true;
+        }
+
+        if (in_array($menu['id'], $this->getMenuPermissions())) {
+            return true;
+        }
+
+        return false;
+    }
 
     /**
-     * @param Route $route
+     * Get all menu permissions
      *
+     * @return array
+     */
+    protected function getMenuPermissions(): array
+    {
+        $menuPermissions = [];
+
+        // Merged role menu permissions
+        foreach ($this->roles()->pluck('permissions') as $permission) {
+            if (isset($permission['menus'])) {
+                $menuPermissions = array_merge($menuPermissions, $permission['menus']);
+            }
+        }
+
+        // Consolidate user menu permissions
+        if (isset($this->permissions['menus'])) {
+            $menuPermissions = array_merge($menuPermissions, $this->permissions['menus']);
+        }
+
+        return array_unique(array_filter($menuPermissions));
+    }
+
+    /**
+     * Determine whether there is routing permission
+     *
+     * @param Route $route
      * @return bool
      */
     public function canRoute(Route $route): bool
@@ -92,27 +112,8 @@ class Administrator extends BaseModel
         return false;
     }
 
-    protected function getMenuPermissions(): array
-    {
-        $menuPermissions = [];
-
-        // 合并角色菜单权限
-        foreach ($this->roles()->pluck('permissions') as $permission) {
-            if (isset($permission['menus'])) {
-                $menuPermissions = array_merge($menuPermissions, $permission['menus']);
-            }
-        }
-
-        // 合并用户菜单权限
-        if (isset($this->permissions['menus'])) {
-            $menuPermissions = array_merge($menuPermissions, $this->permissions['menus']);
-        }
-
-        return $menuPermissions;
-    }
-
     /**
-     * 获取所有路由权限
+     * Get all routing permissions
      *
      * @return array
      */
@@ -120,19 +121,19 @@ class Administrator extends BaseModel
     {
         $routePermissions = [];
 
-        // 合并角色路由权限
+        // Merged role routing permissions
         foreach ($this->roles()->pluck('permissions') as $permission) {
             if (isset($permission['routes'])) {
                 $routePermissions = array_merge($routePermissions, $permission['routes']);
             }
         }
 
-        // 合并用户路由权限
+        // Incorporate user routing permissions
         if (isset($this->permissions['routes'])) {
             $routePermissions = array_merge($routePermissions, $this->permissions['routes']);
         }
 
-        return array_unique($routePermissions);
+        return array_unique(array_filter($routePermissions));
     }
 
     /**

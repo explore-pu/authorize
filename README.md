@@ -25,7 +25,7 @@ php artisan vendor:publish --provider="Encore\Authorize\AuthorizeServiceProvider
 
 Initialization data
 
-```php
+```shell
 php artisan authorize:init
 ```
 
@@ -48,7 +48,7 @@ $router->get('/', 'HomeController@index')->name('home');
 // resource资源路由，将自动生成`列表`、`新增`、`编辑`、`删除`路由权限，其中新增包含（`创建`、`保存`），编辑包含（`编辑`、`更新`）
 $router->resource('users', 'UserController')->names('users');
 // 如果希望多个路由在一个分组下面，可以使用下面的方法，会生成恢复权限
-$router->post('users/{user}/restore', 'UserController@restore')->name('users.restore');
+$router->put('users/{user}/restore', 'UserController@restore')->name('users.restore');
 ```
 
 ### Action通过路由访问控制（推荐使用方式二）
@@ -83,6 +83,7 @@ $router->post('users/{user}/restore', 'UserController@restore')->name('users.res
           return '复制';
       }
   
+      // 二选一
       //========================如果需要权限判断，请添加此方法===========================
       /**
        * 设置路由请求路径
@@ -133,7 +134,7 @@ $router->post('users/{user}/restore', 'UserController@restore')->name('users.res
       // 二选一
       public function replicate($id)
       {
-          //一：在这里进行逻辑处理
+          //一：如果需要权限判断，在这里进行逻辑处理
           try {
               $model = User::withTrashed()->find($id);
               DB::transaction(function () use ($model) {
@@ -144,7 +145,7 @@ $router->post('users/{user}/restore', 'UserController@restore')->name('users.res
           }
           return $this->response()->success('复制成功！')->refresh()->send();
 
-          //二：去Replicate逻辑处理
+          //二：如果不需要权限判断，去Replicate逻辑处理
           //return $this->handleAction();
       }
   }
