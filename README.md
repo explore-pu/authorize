@@ -1,15 +1,11 @@
 # authorize extension for laravel-admin 2.x
 
+> 如果出现语言翻译问题，请添加对应翻译即可
+
 ## 预览图
 > 如果无法显示预览图，请搜“GitHub无法显示图片”解决
+
 ![authorization_legend](resources/assets/legend.png)
-
-> 在2.0正式版发布之前，请使用2.0的最新开发版
-
-```shell
-# 安装2.0版本
-composer require pucoder/laravel-admin:2.*
-```
 
 ## Installation
 
@@ -150,8 +146,6 @@ $router->put('users/{user}/restore', 'UserController@restore')->name('users.rest
       }
   }
   ```
-
-# 如果出现英文，请添加本地翻译即可
 
 ### 关于Switch开关权限
 
