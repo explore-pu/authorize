@@ -1,14 +1,14 @@
 <?php
 
-namespace Encore\Authorize\Http\Controllers;
+namespace Elegant\Utils\Authorization\Http\Controllers;
 
-use Encore\Admin\Facades\Admin;
-use Encore\Admin\Form;
-use Encore\Admin\Http\Controllers\UserController as Controller;
-use Encore\Admin\Models\Menu;
-use Encore\Admin\Show;
-use Encore\Admin\Table;
-use Encore\Authorize\Models\Administrator;
+use Elegant\Utils\Facades\Admin;
+use Elegant\Utils\Form;
+use Elegant\Utils\Http\Controllers\UserController as Controller;
+use Elegant\Utils\Models\Menu;
+use Elegant\Utils\Show;
+use Elegant\Utils\Table;
+use Elegant\Utils\Authorization\Models\Administrator;
 
 class UserController extends Controller
 {
@@ -74,12 +74,12 @@ class UserController extends Controller
      */
     public function form()
     {
-        $roleModel = config('admins.authorize.roles_model');
+        $roleModel = config('elegant-utils.authorization.roles_model');
 
         $form = new Form(new $this->model());
 
-        $userTable = config('admin.database.users_table');
-        $connection = config('admin.database.connection');
+        $userTable = config('elegant-utils.admin.database.users_table');
+        $connection = config('elegant-utils.admin.database.connection');
 
         $form->display('id', 'ID');
         $form->text('username', trans('admin.username'))
@@ -97,7 +97,7 @@ class UserController extends Controller
         $form->multipleSelect('roles', trans('admin.roles'))
             ->options($roleModel::pluck('name', 'id'))
             ->optionDataAttributes('permissions', $roleModel::pluck('permissions', 'id'))
-            ->config('maximumSelectionLength', config('admins.authorize.users_maximum_roles', '0'));
+            ->config('maximumSelectionLength', config('elegant-utils.authorization.users_maximum_roles', '0'));
         $form->embeds('permissions', trans('admin.permissions'), function (Form\EmbeddedForm $embeds) {
             $embeds->row(function (Form\Layout\Row $row) {
                 $row->column(8, function (Form\Layout\Column $column) {

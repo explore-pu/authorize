@@ -10,13 +10,13 @@
 ## Installation
 
 ```shell
-composer require pucoder/authorize
+composer require laravel-admin-utils/authorization
 ```
 
 Publish resources：
 
 ```shell script
-php artisan vendor:publish --provider="Encore\Authorize\AuthorizeServiceProvider"
+php artisan vendor:publish --provider="Elegant\Utils\authorization\AuthorizeServiceProvider"
 ```
 
 Initialization data
@@ -28,9 +28,9 @@ php artisan authorize:init
 > `超级管理员` 拥有所有权限，并且所有的菜单对其可见。
 
 
-打开`http://localhost/admin/admin_roles`管理角色
+打开`http://localhost/roles`管理角色
 
-在用户模块`http://localhost/admin/admin_users`可以给用户添加角色。
+在用户模块`http://localhost/administrators`可以给用户添加角色。
 
 ## 用法
 
@@ -57,8 +57,8 @@ $router->put('users/{user}/restore', 'UserController@restore')->name('users.rest
   ```php
   namespace App\Admin\Actions\Users;
   
-  use Encore\Admin\Actions\Response;
-  use Encore\Admin\Actions\RowAction;
+  use Elegant\Utils\Actions\Response;
+  use Elegant\Utils\Actions\RowAction;
   use Illuminate\Database\Eloquent\Model;
   use Illuminate\Support\Facades\DB;
   
@@ -123,7 +123,7 @@ $router->put('users/{user}/restore', 'UserController@restore')->name('users.rest
 - 创建自定义路由方法
   ```php
   
-  use Encore\Admin\Http\Controllers\HandleController;
+  use Elegant\Utils\Http\Controllers\HandleController;
   
   class UserController extends AdminController
   {

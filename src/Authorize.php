@@ -1,8 +1,8 @@
 <?php
 
-namespace Encore\Authorize;
+namespace Elegant\Utils\Authorization;
 
-use Encore\Admin\Extension;
+use Elegant\Utils\Extension;
 
 class Authorize extends Extension
 {

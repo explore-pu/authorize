@@ -1,17 +1,17 @@
 <?php
 
 return [
-    'roles_table' => 'admin_roles',
+    'roles_table' => 'roles',
 
-    'roles_model' => Encore\Authorize\Models\Role::class,
+    'roles_model' => Elegant\Utils\Authorization\Models\Role::class,
 
-//    'roles_controller' => \Encore\Authorize\Http\Controllers\RoleController::class,
+//    'roles_controller' => \Elegant\Utils\Authorization\Http\Controllers\RoleController::class,
 
-    'users_model' => Encore\Authorize\Models\Administrator::class,
+    'users_model' => Elegant\Utils\Authorization\Models\Administrator::class,
 
-//    'users_controller' => \Encore\Authorize\Http\Controllers\UserController::class,
+//    'users_controller' => \Elegant\Utils\Authorization\Http\Controllers\UserController::class,
 
-    'role_users_table' => 'admin_role_users',
+    'role_users_table' => 'role_users',
 
     // Limit the maximum number of administrator roles that can be selected, default is 0, 0 means no limit
 //    'users_maximum_roles' => 0,

@@ -1,13 +1,13 @@
 <?php
 
-namespace Encore\Authorize\Http\Controllers;
+namespace Elegant\Utils\Authorization\Http\Controllers;
 
-use Encore\Admin\Facades\Admin;
-use Encore\Admin\Form;
-use Encore\Admin\Http\Controllers\AdminController;
-use Encore\Admin\Models\Menu;
-use Encore\Admin\Show;
-use Encore\Admin\Table;
+use Elegant\Utils\Facades\Admin;
+use Elegant\Utils\Form;
+use Elegant\Utils\Http\Controllers\AdminController;
+use Elegant\Utils\Models\Menu;
+use Elegant\Utils\Show;
+use Elegant\Utils\Table;
 
 class RoleController extends AdminController
 {
@@ -26,7 +26,7 @@ class RoleController extends AdminController
      */
     public function table()
     {
-        $roleModel = config('admins.authorize.roles_model');
+        $roleModel = config('elegant-utils.authorization.roles_model');
         $table = new Table(new $roleModel());
         $table->model()->orderByDesc('id');
 
@@ -73,7 +73,7 @@ class RoleController extends AdminController
      */
     protected function detail($id)
     {
-        $roleModel = config('admins.authorize.roles_model');
+        $roleModel = config('elegant-utils.authorization.roles_model');
 
         $show = new Show($roleModel::findOrFail($id));
 
@@ -93,7 +93,7 @@ class RoleController extends AdminController
      */
     public function form()
     {
-        $roleModel = config('admins.authorize.roles_model');
+        $roleModel = config('elegant-utils.authorization.roles_model');
         $form = new Form(new $roleModel());
 
         $form->text('name', trans('admin.name'))->required();

@@ -76,7 +76,7 @@ if (!function_exists('get_routes')) {
             $uri = admin_restore_path($route->uri);
 
             if (isset($route->action['as'])) {
-                if (!in_array($uri, config('admins.authorize.route.excepts')) && mb_strpos($route->action['as'], config('admin.route.as')) !== false) {
+                if (!in_array($uri, config('elegant-utils.authorization.route.excepts')) && mb_strpos($route->action['as'], config('elegant-utils.admin.route.as')) !== false) {
                     $uri = set_route_url($uri);
 
                     $as = admin_restore_route($route->action['as']);
@@ -102,7 +102,7 @@ if (!function_exists('set_permissions')) {
 
             $is_replace = false;
 
-            foreach (config('admins.authorize.route.merge', []) as $search => $replace) {
+            foreach (config('elegant-utils.authorization.route.merge', []) as $search => $replace) {
                 if (in_array($search, $array_keys)) {
                     $array_keys = array_replace($array_keys, [array_search($search, $array_keys) => $replace]);
 

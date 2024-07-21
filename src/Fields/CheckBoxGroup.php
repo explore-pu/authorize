@@ -1,8 +1,8 @@
 <?php
 
-namespace Encore\Authorize\Fields;
+namespace Elegant\Utils\Authorization\Fields;
 
-use Encore\Admin\Form\Field\Checkbox;
+use Elegant\Utils\Form\Field\Checkbox;
 
 class CheckBoxGroup extends Checkbox
 {

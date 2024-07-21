@@ -1,10 +1,10 @@
 <?php
 
-namespace Encore\Authorize;
+namespace Elegant\Utils\Authorization;
 
-use Encore\Admin\Form;
-use Encore\Authorize\Http\Middleware\AuthorizeMiddleware;
-use Encore\Authorize\Models\Administrator;
+use Elegant\Utils\Form;
+use Elegant\Utils\Authorization\Http\Middleware\AuthorizeMiddleware;
+use Elegant\Utils\Authorization\Models\Administrator;
 use Illuminate\Support\ServiceProvider;
 
 class AuthorizeServiceProvider extends ServiceProvider
@@ -53,8 +53,8 @@ class AuthorizeServiceProvider extends ServiceProvider
 
         // 替换配置文件
         config([
-            'admin.auth.providers.admin.model' => config('admins.authorize.users_model', Administrator::class),
-            'admin.database.users_model' => config('admins.authorize.users_model', Administrator::class),
+            'admin.auth.providers.admin.model' => config('elegant-utils.authorization.users_model', Administrator::class),
+            'admin.database.users_model' => config('elegant-utils.authorization.users_model', Administrator::class),
             'admin.route.middleware.authorize' => 'admin.authorize',
         ]);
 

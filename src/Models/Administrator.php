@@ -1,8 +1,8 @@
 <?php
 
-namespace Encore\Authorize\Models;
+namespace Elegant\Utils\Authorization\Models;
 
-use Encore\Admin\Models\Administrator as BaseModel;
+use Elegant\Utils\Models\Administrator as BaseModel;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Routing\Route;
 
@@ -30,8 +30,8 @@ class Administrator extends BaseModel
      */
     public function roles(): BelongsToMany
     {
-        $roleModel = config('admins.authorize.roles_model');
-        $table = config('admins.authorize.role_users_table') ?: 'admin_role_users';
+        $roleModel = config('elegant-utils.authorization.roles_model');
+        $table = config('elegant-utils.authorization.role_users_table') ?: 'admin_role_users';
 
         return $this->belongsToMany($roleModel, $table, 'user_id', 'role_id')->withTimestamps();
     }

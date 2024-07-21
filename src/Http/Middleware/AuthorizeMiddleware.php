@@ -1,10 +1,10 @@
 <?php
 
-namespace Encore\Authorize\Http\Middleware;
+namespace Elegant\Utils\Authorization\Http\Middleware;
 
-use Encore\Admin\Facades\Admin;
-use Encore\Admin\Http\Middleware\Pjax;
-use Encore\Admin\Layout\Content;
+use Elegant\Utils\Facades\Admin;
+use Elegant\Utils\Http\Middleware\Pjax;
+use Elegant\Utils\Layout\Content;
 use Illuminate\Http\Request;
 
 class AuthorizeMiddleware
@@ -43,7 +43,7 @@ class AuthorizeMiddleware
      */
     protected function shouldPassThrough($request): bool
     {
-        return collect(config('admins.authorize.route.excepts', []))
+        return collect(config('elegant-utils.authorization.route.excepts', []))
             ->map('admin_base_path')
             ->contains(function ($except) use ($request) {
                 if ($except !== '/') {

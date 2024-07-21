@@ -1,9 +1,9 @@
 {
-    "name": "pucoder/authorize",
-    "description": "authorize extension of laravel-admin",
+    "name": "laravel-admin-utils/authorization",
+    "description": "authorize utils of laravel-admin",
     "type": "library",
-    "keywords": ["laravel-admin", "extension", "authorize"],
-    "homepage": "https://github.com/pucoder/authorize",
+    "keywords": ["laravel-admin", "utils", "authorization"],
+    "homepage": "https://github.com/laravel-admin-utils/authorization",
     "license": "MIT",
     "authors": [
         {
@@ -12,15 +12,14 @@
         }
     ],
     "require": {
-        "php": ">=7.0.0",
-        "pucoder/laravel-admin": "^2.0"
+        "elegant-utils/laravel-admin": "^2.0"
     },
     "require-dev": {
         "phpunit/phpunit": "~6.0"
     },
     "autoload": {
         "psr-4": {
-            "Encore\\Authorize\\": "src/"
+            "Elegant\\Utils\\Authorization\\": "src/"
         },
         "files": [
             "src/helpers.php"
@@ -29,7 +28,7 @@
     "extra": {
         "laravel": {
             "providers": [
-                "Encore\\Authorize\\AuthorizeServiceProvider"
+                "Elegant\\Utils\\Authorization\\AuthorizeServiceProvider"
             ]
         }
     }

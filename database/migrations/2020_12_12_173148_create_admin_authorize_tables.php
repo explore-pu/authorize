@@ -11,7 +11,7 @@ class CreateAdminAuthorizeTables extends Migration
      */
     public function getConnection()
     {
-        return config('admin.database.connection') ?: config('database.default');
+        return config('elegant-utils.admin.database.connection') ?: config('database.default');
     }
 
     /**
@@ -21,7 +21,7 @@ class CreateAdminAuthorizeTables extends Migration
      */
     public function up()
     {
-        Schema::create(config('admins.authorize.roles_table'), function (Blueprint $table) {
+        Schema::create(config('elegant-utils.authorization.roles_table'), function (Blueprint $table) {
             $table->increments('id');
             $table->string('name', 50)->unique();
             $table->string('slug', 50)->unique();
@@ -30,14 +30,14 @@ class CreateAdminAuthorizeTables extends Migration
             $table->timestamps();
         });
 
-        Schema::create(config('admins.authorize.role_users_table'), function (Blueprint $table) {
+        Schema::create(config('elegant-utils.authorization.role_users_table'), function (Blueprint $table) {
             $table->integer('user_id');
             $table->integer('role_id');
             $table->index(['user_id', 'role_id']);
             $table->timestamps();
         });
 
-        Schema::table(config('admin.database.users_table'), function (Blueprint $table) {
+        Schema::table(config('elegant-utils.admin.database.users_table'), function (Blueprint $table) {
             $table->text('permissions')->nullable()->after('avatar');
         });
     }
@@ -49,7 +49,7 @@ class CreateAdminAuthorizeTables extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists(config('admins.authorize.roles_table'));
-        Schema::dropIfExists(config('admins.authorize.role_users_table'));
+        Schema::dropIfExists(config('elegant-utils.authorization.roles_table'));
+        Schema::dropIfExists(config('elegant-utils.authorization.role_users_table'));
     }
 }

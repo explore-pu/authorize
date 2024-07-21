@@ -1,9 +1,9 @@
 <?php
 
-namespace Encore\Authorize\Console;
+namespace Elegant\Utils\Authorization\Console;
 
-use Encore\Admin\Models\Menu;
-use Encore\Authorize\Models\Administrator;
+use Elegant\Utils\Models\Menu;
+use Elegant\Utils\Authorization\Models\Administrator;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\DB;
 
@@ -66,7 +66,7 @@ class InitCommand extends Command
             ]);
         }
 
-        $roleModel = config('admins.authorize.roles_model');
+        $roleModel = config('elegant-utils.authorization.roles_model');
         // 如果不存在超管角色，创建一个
         if (!$roleModel::query()->where('slug', 'administrator')->exists()) {
             $roleModel::unguard();
@@ -78,7 +78,7 @@ class InitCommand extends Command
             // 给用户设置超管角色
             try{
                 DB::transaction(function () use ($role) {
-                    $userModel = config('admin.database.users_model');
+                    $userModel = config('elegant-utils.admin.database.users_model');
                     $user = $userModel::find(1);
                     $user->roles()->save($role);
                 });
