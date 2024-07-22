@@ -19,26 +19,17 @@ class AuthorizeServiceProvider extends ServiceProvider
     /**
      * {@inheritdoc}
      */
-    public function boot(Authorize $extension)
+    public function boot()
     {
-        if (! Authorize::boot()) {
-            return ;
+        $this->loadViewsFrom(__DIR__.'/../resources/views', 'admin-authorize-view');
+
+        if (file_exists($routes = __DIR__.'/../routes/web.php')) {
+            $this->loadRoutesFrom($routes);
         }
 
-        if ($views = $extension->views) {
-            $this->loadViewsFrom($views, 'admin-authorize-view');
-        }
-
-        $this->app->booted(function () {
-            Authorize::routes(__DIR__.'/../routes/web.php');
-        });
-
-        if ($this->app->runningInConsole() && $migrations = $extension->migrations) {
-            $this->publishes([$migrations => database_path('migrations')], 'admin-authorize-migrations');
-        }
-
-        if ($this->app->runningInConsole() && $migrations = $extension->config) {
-            $this->publishes([$migrations => config_path('admins')], 'admin-authorize-config');
+        if ($this->app->runningInConsole()) {
+            $this->publishes([__DIR__ . '/../database/migrations' => database_path('migrations')], 'admin-authorize-migrations');
+            $this->publishes([__DIR__ . '/../config' => config_path('elegant-utils')], 'admin-authorize-config');
         }
     }
 
@@ -49,14 +40,14 @@ class AuthorizeServiceProvider extends ServiceProvider
      */
     public function register()
     {
-        app('router')->aliasMiddleware('admin.authorize', AuthorizeMiddleware::class);
-
         // 替换配置文件
         config([
-            'admin.auth.providers.admin.model' => config('elegant-utils.authorization.users_model', Administrator::class),
-            'admin.database.users_model' => config('elegant-utils.authorization.users_model', Administrator::class),
-            'admin.route.middleware.authorize' => 'admin.authorize',
+            'elegant-utils.admin.auth.providers.admin.model' => config('elegant-utils.authorization.users_model', Administrator::class),
+            'elegant-utils.admin.database.users_model' => config('elegant-utils.authorization.users_model', Administrator::class),
+            'elegant-utils.admin.route.middleware.authorize' => 'admin.authorize',
         ]);
+
+        app('router')->aliasMiddleware('admin.authorize', AuthorizeMiddleware::class);
 
         $this->commands($this->commands);
 

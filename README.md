@@ -15,8 +15,8 @@ composer require laravel-admin-utils/authorization
 
 Publish resources：
 
-```shell script
-php artisan vendor:publish --provider="Elegant\Utils\authorization\AuthorizeServiceProvider"
+```shell
+php artisan vendor:publish --provider="Elegant\Utils\Authorization\AuthorizeServiceProvider"
 ```
 
 Initialization data

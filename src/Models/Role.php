@@ -14,13 +14,7 @@ class Role extends Model
     use SoftDeletes;
 
     protected $fillable = [
-        'slug',
         'name',
-        'permissions'
-    ];
-
-    protected $casts = [
-        'permissions'  => 'json'
     ];
 
     /**
