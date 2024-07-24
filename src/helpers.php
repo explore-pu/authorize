@@ -1,5 +1,39 @@
 <?php
 
+if (!function_exists('admin_restore_path')) {
+    /**
+     * restore admin url.
+     *
+     * @param string $path
+     * @return string
+     */
+    function admin_restore_path($path = '')
+    {
+        $new_path = [];
+        foreach (explode('/', $path) as $value) {
+            if ($value !== config('admin.route.prefix')) {
+                array_push($new_path, $value);
+            }
+        }
+
+        return $new_path ? implode('/', $new_path) : '/';
+    }
+}
+
+if (!function_exists('admin_restore_route')) {
+    function admin_restore_route($name)
+    {
+        $route = [];
+        foreach (explode('.', $name) as $string) {
+            if ($string !== 'admin') {
+                $route[] = $string;
+            }
+        }
+
+        return implode('.', $route);
+    }
+}
+
 if (!function_exists('string_between')) {
     /**
      * @param string $strings
@@ -63,13 +97,9 @@ if (!function_exists('get_routes')) {
     function get_routes()
     {
         $routes = [
-            'all_permissions' => '*',
+            'all' => '*',
             'home' => '',
             'auth_setting' => '',
-            'auth_users' => [],
-            'auth_menus' => [],
-            'auth_roles' => [],
-            'auth_logs'  => [],
         ];
 
         foreach (app('router')->getRoutes() as $route) {

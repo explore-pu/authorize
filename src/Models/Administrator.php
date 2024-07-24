@@ -11,18 +11,6 @@ use Illuminate\Routing\Route;
  */
 class Administrator extends BaseModel
 {
-    protected $fillable = [
-        'username',
-        'password',
-        'name',
-        'avatar',
-        'permissions'
-    ];
-
-    protected $casts = [
-        'permissions'  => 'json'
-    ];
-
     /**
      * Current user roles
      *
@@ -30,10 +18,40 @@ class Administrator extends BaseModel
      */
     public function roles(): BelongsToMany
     {
-        $roleModel = config('elegant-utils.authorization.roles_model');
-        $table = config('elegant-utils.authorization.role_users_table') ?: 'admin_role_users';
+        $roleModel = config('elegant-utils.authorization.roles.model');
+        $table = config('elegant-utils.authorization.user_role_relational.table');
+        $user_id = config('elegant-utils.authorization.user_role_relational.user_id');
+        $role_id = config('elegant-utils.authorization.user_role_relational.role_id');
 
-        return $this->belongsToMany($roleModel, $table, 'user_id', 'role_id')->withTimestamps();
+        return $this->belongsToMany($roleModel, $table, $user_id, $role_id)->withTimestamps();
+    }
+
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany
+     */
+    public function menus(): BelongsToMany
+    {
+        $menuModel = config('elegant-utils.admin.database.menus_model');
+        $table = config('elegant-utils.authorization.user_menu_relational.table');
+        $user_id = config('elegant-utils.authorization.user_menu_relational.user_id');
+        $menu_id = config('elegant-utils.authorization.user_menu_relational.menu_id');
+
+        return $this->belongsToMany($menuModel, $table, $user_id, $menu_id)->withTimestamps();
+    }
+
+    public function roleMenus()
+    {
+        return $this->roles()->with('menus');
+    }
+
+    public function allMenus()
+    {
+        return array_merge(call_user_func_array('array_merge', $this->roleMenus->pluck('menus')->toArray()), $this->menus->toArray());
+    }
+
+    public function allMenusId()
+    {
+        return array_values(array_unique(array_column($this->allMenus(), 'id')));
     }
 
     /**
@@ -52,7 +70,7 @@ class Administrator extends BaseModel
      * @param $menu
      * @return bool
      */
-    public function canMenu($menu): bool
+    public function canSeeMenu($menu): bool
     {
         if ($this->isAdministrator()) {
             return true;
@@ -95,13 +113,15 @@ class Administrator extends BaseModel
      * @param Route $route
      * @return bool
      */
-    public function canRoute(Route $route): bool
+    public function canAccessRoute(Route $route): bool
     {
         if ($this->isAdministrator()) {
             return true;
         }
 
         $uri = set_route_url(admin_restore_path($route->uri()));
+
+        dd($uri);
 
         foreach ($this->getRoutePermissions() as $permissions) {
             if ($permissions === '*' || in_array($route->methods[0] . '=>' . $uri, explode('&&', $permissions))) {

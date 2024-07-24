@@ -2,10 +2,10 @@
 
 namespace Elegant\Utils\Authorization\Http\Middleware;
 
-use Elegant\Utils\Facades\Admin;
 use Elegant\Utils\Http\Middleware\Pjax;
 use Elegant\Utils\Layout\Content;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class AuthorizeMiddleware
 {
@@ -16,11 +16,11 @@ class AuthorizeMiddleware
      */
     public function handle(Request $request, \Closure $next)
     {
-        if (!Admin::user() || $this->shouldPassThrough($request)) {
+        if (!Auth::user() || $this->shouldPassThrough($request)) {
             return $next($request);
         }
 
-        if (Admin::user()->canRoute($request->route())) {
+        if (Auth::user()->canAccessRoute($request->route())) {
             return $next($request);
         }
 

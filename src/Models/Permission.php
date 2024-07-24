@@ -2,8 +2,7 @@
 
 namespace Elegant\Utils\Authorization\Models;
 
-use Educate\Core\Traits\DefaultDatetimeFormat;
-use Educate\Core\Traits\ForceTruncate;
+use Elegant\Utils\Traits\DefaultDatetimeFormat;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
@@ -13,7 +12,6 @@ class Permission extends Model
 {
     use HasFactory;
     use SoftDeletes;
-    use ForceTruncate;
     use DefaultDatetimeFormat;
 
     /**
@@ -22,8 +20,8 @@ class Permission extends Model
      * @var string[]
      */
     protected $fillable = [
+        'menu_id',
         'name',
-        'as',
         'method',
         'uri',
     ];
@@ -31,9 +29,14 @@ class Permission extends Model
     /**
      * @return BelongsToMany
      */
-    public function workers(): BelongsToMany
+    public function users(): BelongsToMany
     {
-        return $this->belongsToMany(Worker::class, 'worker_permissions', 'permission_id', 'worker_id')->withTimestamps();
+        $userModel = config('elegant-utils.authorization.users.model');
+        $table = config('elegant-utils.authorization.user_permission_relational.table');
+        $permission_id = config('elegant-utils.authorization.user_permission_relational.permission_id');
+        $user_id = config('elegant-utils.authorization.user_permission_relational.user_id');
+
+        return $this->belongsToMany($userModel, $table, $permission_id, $user_id)->withTimestamps();
     }
 
     /**
@@ -41,6 +44,48 @@ class Permission extends Model
      */
     public function roles(): BelongsToMany
     {
-        return $this->belongsToMany(Role::class, 'role_permissions', 'permission_id', 'role_id')->withTimestamps();
+        $roleModel = config('elegant-utils.authorization.roles.model');
+        $table = config('elegant-utils.authorization.role_permission_relational.table');
+        $permission_id = config('elegant-utils.authorization.role_permission_relational.permission_id');
+        $role_id = config('elegant-utils.authorization.role_permission_relational.role_id');
+
+        return $this->belongsToMany($roleModel, $table, $permission_id, $role_id)->withTimestamps();
+    }
+
+    public function menu()
+    {
+        $menuModel = config('elegant-utils.admin.database.menus_model');
+
+        return $this->belongsTo($menuModel, 'menu_id');
+    }
+
+    public function setMethodAttribute($value)
+    {
+        $this->attributes['method'] = implode(',', $value);
+    }
+
+    // 修改器：从数据库中获取 tags 字段并转换为数组
+    public function getMethodAttribute($value)
+    {
+        return explode(',', $value);
+    }
+
+    public static function getOptions()
+    {
+        $permissionModel = new static();
+
+        $permissions = $permissionModel::query()
+            ->with(['menu'])
+            ->get()
+            ->toArray();
+
+        return array_reduce($permissions, function ($result, $permission) {
+            if (!empty($permission['menu'])) {
+                $result[$permission['menu']['title']][$permission['id']] = $permission['name'];
+            } else {
+                $result[$permission['id']] = $permission['name'];
+            }
+            return $result;
+        }, []);
     }
 }

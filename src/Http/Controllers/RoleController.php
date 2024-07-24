@@ -2,12 +2,14 @@
 
 namespace Elegant\Utils\Authorization\Http\Controllers;
 
+use Elegant\Utils\Authorization\Models\Permission;
 use Elegant\Utils\Facades\Admin;
 use Elegant\Utils\Form;
 use Elegant\Utils\Http\Controllers\AdminController;
 use Elegant\Utils\Models\Menu;
 use Elegant\Utils\Show;
 use Elegant\Utils\Table;
+use Illuminate\Support\Facades\Auth;
 
 class RoleController extends AdminController
 {
@@ -26,7 +28,7 @@ class RoleController extends AdminController
      */
     public function table()
     {
-        $roleModel = config('elegant-utils.authorization.roles_model');
+        $roleModel = config('elegant-utils.authorization.roles.model');
         $table = new Table(new $roleModel());
         $table->model()->orderByDesc('id');
 
@@ -73,7 +75,7 @@ class RoleController extends AdminController
      */
     protected function detail($id)
     {
-        $roleModel = config('elegant-utils.authorization.roles_model');
+        $roleModel = config('elegant-utils.authorization.roles.model');
 
         $show = new Show($roleModel::findOrFail($id));
 
@@ -93,28 +95,71 @@ class RoleController extends AdminController
      */
     public function form()
     {
-        $roleModel = config('elegant-utils.authorization.roles_model');
+        $roleModel = config('elegant-utils.authorization.roles.model');
+        $menuModel = config('elegant-utils.admin.database.menus_model');
+        $permissionModel = config('elegant-utils.authorization.permissions.model');
         $form = new Form(new $roleModel());
 
-        $form->text('name', trans('admin.name'))->required();
-        $form->text('slug', trans('admin.slug'))->with(function ($value, Form\Field $field) {
-            if ($value == 'administrator') {
-                $field->readonly();
-            }
-        })->required();
-
-        $form->embeds('permissions', trans('admin.permissions'), function (Form\EmbeddedForm $embeds) {
-            $embeds->row(function (Form\Layout\Row $row) {
-                $row->column(8, function (Form\Layout\Column $column) {
-                    $column->checkboxGroup('routes', trans('admin.route').trans('admin.permissions'))
-                        ->options(group_permissions());
-                });
-                $row->column(4, function (Form\Layout\Column $column) {
-                    $column->checktree('menus', trans('admin.menus').trans('admin.permissions'))
-                        ->options(Admin::menu());
-                });
+        $form->row(function (Form\Layout\Row $row) use ($roleModel) {
+            $row->column(6, function (Form\Layout\Column $column) use ($roleModel) {
+                $column->text('name', trans('admin.name'))
+                    ->creationRules(['required', "unique:{$roleModel}"])
+                    ->updateRules(['required', "unique:{$roleModel},name,{{id}}"]);
+            });
+            $row->column(6, function (Form\Layout\Column $column) use ($roleModel) {
+                $column->text('slug', trans('admin.slug'))
+                    ->with(function ($value, Form\Field $field) {
+                        if ($value == 'administrator') {
+                            $field->readonly();
+                        }
+                    })
+                    ->creationRules(['required', "unique:{$roleModel}"])
+                    ->updateRules(['required', "unique:{$roleModel},slug,{{id}}"]);
             });
         });
+
+        $form->checkbox('menus', trans('admin.menus'))->options($menuModel::query()->pluck('title', 'id')->toArray())->disable();
+
+        $form->checkboxGroup('permissions', trans('admin.menus').trans('admin.permissions'))
+            ->options($permissionModel::getOptions());
+
+
+//        $form->saving(function (Form $form) {
+//            dd($form->menus);
+//        });
+
+//        $form->row(function (Form\Layout\Row $row) {
+//            $row->column(4, function (Form\Layout\Column $column) {
+//                $column->checktree('menus', trans('admin.menus'))
+//                    ->options(Admin::menu());
+//            });
+//            $row->column(8, function (Form\Layout\Column $column) {
+//                $permissionModel = config('elegant-utils.authorization.permissions.model');
+//                $column->checkboxGroup('permissions', trans('admin.permissions'))
+//                    ->options($permissionModel::getOptions());
+//            });
+//        });
+
+//        $form->embeds('permissions', trans('admin.permissions'), function (Form\EmbeddedForm $embeds) {
+//            $embeds->row(function (Form\Layout\Row $row) {
+//                $row->column(8, function (Form\Layout\Column $column) {
+//                    $column->checkboxGroup('routes', trans('admin.route').trans('admin.permissions'))
+//                        ->options(group_permissions());
+//                });
+//                $row->column(4, function (Form\Layout\Column $column) {
+//                    $menus = [
+//                        [
+//                            'id' => 0,
+//                            'text' => '所有',
+//                            'children' => Admin::menu()
+//                        ]
+//                    ];
+//
+//                    $column->checktree('menus', trans('admin.menus').trans('admin.permissions'))
+//                        ->options($menus)->checked([1,2,3]);
+//                });
+//            });
+//        });
 
         return $form;
     }

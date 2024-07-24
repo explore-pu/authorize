@@ -1,9 +1,9 @@
 <?php
 
 return [
-    'users' => [
+    'administrators' => [
         'model' => Elegant\Utils\Authorization\Models\Administrator::class,
-//        'controller' => \Elegant\Utils\Authorization\Http\Controllers\UserController::class,
+//        'controller' => \Elegant\Utils\Authorization\Http\Controllers\AdministratorController::class,
     ],
 
     'roles' => [
@@ -34,6 +34,18 @@ return [
         'table' => 'user_permissions',
         'user_id' => 'user_id',
         'permission_id' => 'permission_id',
+    ],
+
+    'role_menu_relational' => [
+        'table' => 'role_menus',
+        'role_id' => 'role_id',
+        'menu_id' => 'menu_id',
+    ],
+
+    'user_menu_relational' => [
+        'table' => 'worker_menus',
+        'user_id' => 'worker_id',
+        'menu_id' => 'menu_id',
     ],
 
     // Limit the maximum number of administrator roles that can be selected, default is 0, 0 means no limit

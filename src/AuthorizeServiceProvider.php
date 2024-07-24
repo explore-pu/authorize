@@ -2,9 +2,11 @@
 
 namespace Elegant\Utils\Authorization;
 
+use Elegant\Utils\Authorization\Http\Controllers\AdministratorController;
 use Elegant\Utils\Form;
 use Elegant\Utils\Authorization\Http\Middleware\AuthorizeMiddleware;
 use Elegant\Utils\Authorization\Models\Administrator;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\ServiceProvider;
 
 class AuthorizeServiceProvider extends ServiceProvider
@@ -40,14 +42,15 @@ class AuthorizeServiceProvider extends ServiceProvider
      */
     public function register()
     {
+        app('router')->aliasMiddleware('admin.authorize', AuthorizeMiddleware::class);
+
         // 替换配置文件
         config([
-            'elegant-utils.admin.auth.providers.admin.model' => config('elegant-utils.authorization.users_model', Administrator::class),
-            'elegant-utils.admin.database.users_model' => config('elegant-utils.authorization.users_model', Administrator::class),
+            'auth.providers.users.model' => config('elegant-utils.authorization.administrators.model', Administrator::class),
+            'elegant-utils.admin.database.administrator_model' => config('elegant-utils.authorization.administrators.model', Administrator::class),
+            'elegant-utils.admin.database.administrator_controller' => config('elegant-utils.authorization.administrators.controller', AdministratorController::class),
             'elegant-utils.admin.route.middleware.authorize' => 'admin.authorize',
         ]);
-
-        app('router')->aliasMiddleware('admin.authorize', AuthorizeMiddleware::class);
 
         $this->commands($this->commands);
 

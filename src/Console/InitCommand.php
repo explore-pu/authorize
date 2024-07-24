@@ -66,7 +66,7 @@ class InitCommand extends Command
             ]);
         }
 
-        $roleModel = config('elegant-utils.authorization.roles_model');
+        $roleModel = config('elegant-utils.authorization.roles.model');
         // 如果不存在超管角色，创建一个
         if (!$roleModel::query()->where('slug', 'administrator')->exists()) {
             $roleModel::unguard();
@@ -78,7 +78,7 @@ class InitCommand extends Command
             // 给用户设置超管角色
             try{
                 DB::transaction(function () use ($role) {
-                    $userModel = config('elegant-utils.admin.database.users_model');
+                    $userModel = config('elegant-utils.admin.database.administrator_model');
                     $user = $userModel::find(1);
                     $user->roles()->save($role);
                 });

@@ -16,13 +16,13 @@
         @foreach($options as $group => $labels)
             @if(is_array($labels))
                 <div class="row group">
-                    <div class="col-2">
+                    <div class="col-md-2">
                         <span class="icheck-@color">
                             <input type="checkbox" id="@id" class="{{ $checkAllClass }}"/>
                             <label for="@id" class="my-1">{{ $group }}</label>
                         </span>
                     </div>
-                    <div class="col-10 border-left">
+                    <div class="col-md-10 border-left">
                         @foreach($labels as $option => $label)
                             {!! $inline ? admin_color('<span class="icheck-%s">') : admin_color('<div class="radio icheck-%s">') !!}
                             <input type="checkbox" id="@id" name="{{ $name }}[]" value="{{ $option }}" class="{{ $class }} children"
@@ -48,7 +48,6 @@
         var related_field = JSON.parse('{!! $relatedField !!}');
 
         if (related_field.length > 0) {
-
             var related = $('.field-' + related_field[0]);
             checkRelated(related);
 
@@ -60,16 +59,16 @@
                 var data_fileds = [];
                 $.each($(roles).find('option:selected'), function (key, val) {
                     let push = $(val).data(related_field[1]);
-                    let data_field = (related_field[1]).split('->');
+                    let data_field = related_field[1];
                     if (data_field.length > 1) {
-                        push = $(val).data(data_field[0])[data_field[1]];
+                        push = $(val).data(data_field);
                     }
                     data_fileds.push(push);
                 });
 
                 $('{{ $selector }}:disabled').prop('checked', false).attr({'disabled' : false});
                 $.each($('{{ $selector }}'), function (k, v) {
-                    if ($.inArray($(v).val(), data_fileds.flat()) !== -1) {
+                    if ($.inArray(parseInt($(v).val()), data_fileds.flat()) !== -1) {
                         $(v).prop('checked', true).attr({'disabled' : true});
                     }
                     checkGroup(v);
