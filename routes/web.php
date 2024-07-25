@@ -12,14 +12,11 @@ Route::group([
     'as'         => config('elegant-utils.admin.route.as'),
 ], function (Router $router) {
     $administratorController = config('elegant-utils.authorization.administrators.controller', AdministratorController::class);
-
     $administrator_table = config('elegant-utils.admin.database.administrator_table');
-
     $router->resource($administrator_table, $administratorController)->names($administrator_table);
 
     $roleController = config('elegant-utils.authorization.roles.controller', RoleController::class);
     $role_table = config('elegant-utils.authorization.roles.table');
-
     $router->resource($role_table, $roleController)->names($role_table);
     $router->put($role_table . '/{' . Str::singular($role_table) . '}/restore', $roleController.'@restore')->name($role_table . '.restore');
     $router->delete($role_table . '/{' . Str::singular($role_table) . '}/delete', $roleController.'@delete')->name($role_table . '.delete');

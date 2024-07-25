@@ -16,13 +16,13 @@
         @foreach($options as $group => $labels)
             @if(is_array($labels))
                 <div class="row group">
-                    <div class="col-md-2">
+                    <div class="col-md-2 border-right">
                         <span class="icheck-@color">
                             <input type="checkbox" id="@id" class="{{ $checkAllClass }}"/>
-                            <label for="@id" class="my-1">{{ $group }}</label>
+                            <label for="@id" class="my-1">&nbsp;{{ $group }}&nbsp;&nbsp;</label>
                         </span>
                     </div>
-                    <div class="col-md-10 border-left">
+                    <div class="col-md-10">
                         @foreach($labels as $option => $label)
                             {!! $inline ? admin_color('<span class="icheck-%s">') : admin_color('<div class="radio icheck-%s">') !!}
                             <input type="checkbox" id="@id" name="{{ $name }}[]" value="{{ $option }}" class="{{ $class }} children"

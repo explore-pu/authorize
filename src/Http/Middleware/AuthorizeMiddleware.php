@@ -6,6 +6,7 @@ use Elegant\Utils\Http\Middleware\Pjax;
 use Elegant\Utils\Layout\Content;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Route;
 
 class AuthorizeMiddleware
 {
@@ -44,10 +45,9 @@ class AuthorizeMiddleware
     protected function shouldPassThrough($request): bool
     {
         return collect(config('elegant-utils.authorization.route.excepts', []))
-            ->map('admin_base_path')
             ->contains(function ($except) use ($request) {
                 if ($except !== '/') {
-                    $except = trim($except, '/');
+                    $except = ltrim($except, '/');
                 }
 
                 return $request->is($except);

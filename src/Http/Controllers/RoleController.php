@@ -118,48 +118,17 @@ class RoleController extends AdminController
             });
         });
 
-        $form->checkbox('menus', trans('admin.menus'))->options($menuModel::query()->pluck('title', 'id')->toArray())->disable();
-
-        $form->checkboxGroup('permissions', trans('admin.menus').trans('admin.permissions'))
-            ->options($permissionModel::getOptions());
-
-
-//        $form->saving(function (Form $form) {
-//            dd($form->menus);
-//        });
-
-//        $form->row(function (Form\Layout\Row $row) {
-//            $row->column(4, function (Form\Layout\Column $column) {
-//                $column->checktree('menus', trans('admin.menus'))
-//                    ->options(Admin::menu());
-//            });
-//            $row->column(8, function (Form\Layout\Column $column) {
-//                $permissionModel = config('elegant-utils.authorization.permissions.model');
-//                $column->checkboxGroup('permissions', trans('admin.permissions'))
-//                    ->options($permissionModel::getOptions());
-//            });
-//        });
-
-//        $form->embeds('permissions', trans('admin.permissions'), function (Form\EmbeddedForm $embeds) {
-//            $embeds->row(function (Form\Layout\Row $row) {
-//                $row->column(8, function (Form\Layout\Column $column) {
-//                    $column->checkboxGroup('routes', trans('admin.route').trans('admin.permissions'))
-//                        ->options(group_permissions());
-//                });
-//                $row->column(4, function (Form\Layout\Column $column) {
-//                    $menus = [
-//                        [
-//                            'id' => 0,
-//                            'text' => '所有',
-//                            'children' => Admin::menu()
-//                        ]
-//                    ];
-//
-//                    $column->checktree('menus', trans('admin.menus').trans('admin.permissions'))
-//                        ->options($menus)->checked([1,2,3]);
-//                });
-//            });
-//        });
+        $form->row(function (Form\Layout\Row $row) {
+            $row->column(4, function (Form\Layout\Column $column) {
+                $column->checkboxTree('menus', trans('admin.menus').trans('admin.permissions'))
+                    ->options(Admin::menu());
+            });
+            $row->column(8, function (Form\Layout\Column $column) {
+                $permissionModel = config('elegant-utils.authorization.permissions.model');
+                $column->checkboxGroup('permissions', trans('admin.action').trans('admin.permissions'))
+                    ->options($permissionModel::getOptions());
+            });
+        });
 
         return $form;
     }

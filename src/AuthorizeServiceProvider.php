@@ -55,5 +55,6 @@ class AuthorizeServiceProvider extends ServiceProvider
         $this->commands($this->commands);
 
         Form::extend('checkboxGroup', Fields\CheckBoxGroup::class);
+        Form::extend('checkboxTree', Fields\CheckBoxTree::class);
     }
 }

@@ -14,7 +14,7 @@ class Administrator extends BaseModel
     /**
      * Current user roles
      *
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany
+     * @return BelongsToMany
      */
     public function roles(): BelongsToMany
     {
@@ -27,7 +27,20 @@ class Administrator extends BaseModel
     }
 
     /**
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany
+     * @return BelongsToMany
+     */
+    public function permissions(): BelongsToMany
+    {
+        $permissionModel = config('elegant-utils.authorization.permissions.model');
+        $table = config('elegant-utils.authorization.user_permission_relational.table');
+        $user_id = config('elegant-utils.authorization.user_permission_relational.user_id');
+        $permission_id = config('elegant-utils.authorization.user_permission_relational.permission_id');
+
+        return $this->belongsToMany($permissionModel, $table, $user_id, $permission_id)->withTimestamps();
+    }
+
+    /**
+     * @return BelongsToMany
      */
     public function menus(): BelongsToMany
     {
@@ -39,19 +52,30 @@ class Administrator extends BaseModel
         return $this->belongsToMany($menuModel, $table, $user_id, $menu_id)->withTimestamps();
     }
 
+    /**
+     * @return BelongsToMany
+     */
     public function roleMenus()
     {
         return $this->roles()->with('menus');
     }
 
+    /**
+     * @return array
+     */
     public function allMenus()
     {
         return array_merge(call_user_func_array('array_merge', $this->roleMenus->pluck('menus')->toArray()), $this->menus->toArray());
     }
 
-    public function allMenusId()
+    public function rolePermissions()
     {
-        return array_values(array_unique(array_column($this->allMenus(), 'id')));
+        return $this->roles()->with('permissions');
+    }
+
+    public function allPermissions()
+    {
+        return array_merge(call_user_func_array('array_merge', $this->rolePermissions->pluck('permissions')->toArray()), $this->permissions->toArray());
     }
 
     /**
@@ -76,35 +100,11 @@ class Administrator extends BaseModel
             return true;
         }
 
-        if (in_array($menu['id'], $this->getMenuPermissions())) {
+        if (in_array($menu['id'], array_column($this->allMenus(), 'id'))) {
             return true;
         }
 
         return false;
-    }
-
-    /**
-     * Get all menu permissions
-     *
-     * @return array
-     */
-    protected function getMenuPermissions(): array
-    {
-        $menuPermissions = [];
-
-        // Merged role menu permissions
-        foreach ($this->roles()->pluck('permissions') as $permission) {
-            if (isset($permission['menus'])) {
-                $menuPermissions = array_merge($menuPermissions, $permission['menus']);
-            }
-        }
-
-        // Consolidate user menu permissions
-        if (isset($this->permissions['menus'])) {
-            $menuPermissions = array_merge($menuPermissions, $this->permissions['menus']);
-        }
-
-        return array_unique(array_filter($menuPermissions));
     }
 
     /**
@@ -119,41 +119,24 @@ class Administrator extends BaseModel
             return true;
         }
 
-        $uri = set_route_url(admin_restore_path($route->uri()));
+        foreach ($this->allPermissions() as $permissions) {
+            if ($permissions['uri'] === '*') {
+                return true;
+            }
 
-        dd($uri);
+            $uris = preg_split('/\r\n|\r|\n/', $permissions['uri'], -1, PREG_SPLIT_NO_EMPTY);
+            array_walk($uris, function (&$uri) {
+                if ($uri !== '/') {
+                    $uri = ltrim($uri, '/');
+                }
+            });
 
-        foreach ($this->getRoutePermissions() as $permissions) {
-            if ($permissions === '*' || in_array($route->methods[0] . '=>' . $uri, explode('&&', $permissions))) {
+            if (!empty(array_intersect($permissions['method'], $route->methods)) && in_array($route->uri(), $uris)) {
                 return true;
             }
         }
 
         return false;
-    }
-
-    /**
-     * Get all routing permissions
-     *
-     * @return array
-     */
-    protected function getRoutePermissions(): array
-    {
-        $routePermissions = [];
-
-        // Merged role routing permissions
-        foreach ($this->roles()->pluck('permissions') as $permission) {
-            if (isset($permission['routes'])) {
-                $routePermissions = array_merge($routePermissions, $permission['routes']);
-            }
-        }
-
-        // Incorporate user routing permissions
-        if (isset($this->permissions['routes'])) {
-            $routePermissions = array_merge($routePermissions, $this->permissions['routes']);
-        }
-
-        return array_unique(array_filter($routePermissions));
     }
 
     /**
@@ -168,6 +151,8 @@ class Administrator extends BaseModel
         static::deleting(function ($model) {
             if (!method_exists($model, 'trashed') || (method_exists($model, 'trashed') && $model->trashed())) {
                 $model->roles()->detach();
+                $model->permissions()->detach();
+                $model->menus()->detach();
             }
         });
     }

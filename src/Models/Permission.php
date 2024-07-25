@@ -77,15 +77,25 @@ class Permission extends Model
         $permissions = $permissionModel::query()
             ->with(['menu'])
             ->get()
-            ->toArray();
+            ->reduce(function ($result, $permission) {
+                if (!empty($permission['menu'])) {
+                    $result[$permission['menu']['title']][$permission['id']] = $permission['name'];
+                } else {
+                    $result[$permission['id']] = $permission['name'];
+                }
+                return $result;
+            });
 
-        return array_reduce($permissions, function ($result, $permission) {
-            if (!empty($permission['menu'])) {
-                $result[$permission['menu']['title']][$permission['id']] = $permission['name'];
+        $data = [];
+
+        foreach ($permissions as $key => $permission) {
+            if (is_array($permission) && count($permission) === 1) {
+                $data[array_key_first($permission)] = $permission[array_key_first($permission)];
             } else {
-                $result[$permission['id']] = $permission['name'];
+                $data[$key] = $permission;
             }
-            return $result;
-        }, []);
+        }
+
+       return $data;
     }
 }

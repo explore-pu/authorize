@@ -52,10 +52,11 @@ return [
 //    'users_maximum_roles' => 0,
 
     'route' => [
-        // 授权时需要排除的路由
+        // Routes that need to be excluded when authorizing
         'excepts' => [
             "login",
             "logout",
+            "setting",
             "_handle_form_",
             "_handle_action_",
             "_handle_selectable_",
@@ -63,11 +64,5 @@ return [
             "_require_config",
             "{fallbackPlaceholder}",
         ],
-        // 授权时需要合并的路由 【key的权限合并到value权限】
-        'merge' => [
-            'auth_setting_put' => 'auth_setting',
-            'store' => 'create',
-            'update' => 'edit',
-        ]
     ]
 ];
